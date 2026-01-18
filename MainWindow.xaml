@@ -1,0 +1,161 @@
+<Window
+    x:Class="RobotClientTCP.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Centre de Contrôle Robot">
+
+    <Grid Padding="20" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <Grid.Resources>
+            <Style x:Key="ModeButtonStyle" TargetType="RadioButton">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="10,8"/>
+                <Setter Property="Margin" Value="0,2"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Grid>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed"/>
+                                        <VisualState x:Name="Disabled"/>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="CheckStates">
+                                        <VisualState x:Name="Checked">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightAccentBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="BorderBrush">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightAccentBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Content" Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="White"/>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Unchecked"/>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                                    <ContentPresenter x:Name="Content" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,20" HorizontalAlignment="Center">
+            <TextBox x:Name="TxtIp" Header="Adresse IP" Text="10.227.8.194" Width="150"/>
+            <TextBox x:Name="TxtPort" Header="Port Data" Text="10001" Width="80"/>
+            <TextBox x:Name="VideoPort" Header="Port Video" Text="8889" Width="80"/>
+            <Button x:Name="BtnConnect" Content="Connexion" Click="BtnConnect_Click" VerticalAlignment="Bottom" Style="{StaticResource AccentButtonStyle}"/>
+            <TextBlock x:Name="TxtStatus" Text="Non connecté" VerticalAlignment="Bottom" Margin="10,0,0,5" Foreground="Gray"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center" Width="160" Margin="0,0,10,0">
+                <TextBlock Text="Modes" Style="{StaticResource CaptionTextBlockStyle}" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <RadioButton x:Name="RbStop" Content="Arrêt" Tag="MODE:ARRET" Checked="BtnMode_Checked" IsChecked="True" Style="{StaticResource ModeButtonStyle}"/>
+                <RadioButton x:Name="RbManual" Content="Manuel" Tag="MODE:MANUEL" Checked="BtnMode_Checked" Style="{StaticResource ModeButtonStyle}"/>
+                <RadioButton x:Name="RbLine" Content="Suivi de ligne" Tag="MODE:LINE" Checked="BtnMode_Checked" Style="{StaticResource ModeButtonStyle}"/>
+                <RadioButton x:Name="RbColor" Content="Trackeur couleur" Tag="MODE:COLOR" Checked="BtnMode_Checked" Style="{StaticResource ModeButtonStyle}"/>
+
+                <StackPanel x:Name="PanelSubColor" Visibility="Collapsed" Margin="20,0,0,5" Spacing="5">
+                    <ToggleButton x:Name="BtnRecherche" Content="Recherche" Click="BtnRecherche_Click" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <RadioButton x:Name="RbFigure" Content="Figure" Tag="MODE:FIGURE" Checked="BtnMode_Checked" Style="{StaticResource ModeButtonStyle}"/>
+
+                <StackPanel x:Name="PanelSubFigure" Visibility="Collapsed" Margin="20,0,0,5" Spacing="5">
+                    <Button Content="Figure 1" Tag="CMD:FIG1" Click="BtnSubCommand_Click" HorizontalAlignment="Stretch"/>
+                    <Button Content="Figure 2" Tag="CMD:FIG2" Click="BtnSubCommand_Click" HorizontalAlignment="Stretch"/>
+                    <Button Content="Figure 3" Tag="CMD:FIG3" Click="BtnSubCommand_Click" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Border Grid.Column="1" CornerRadius="8" BorderBrush="Gray" BorderThickness="2" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0">
+                <Grid>
+                    <TextBlock Text="Pas de signal vidéo" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image x:Name="VideoDisplay" Stretch="Uniform"/>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="2" Spacing="20" VerticalAlignment="Center" Margin="10,0,0,0">
+
+                <StackPanel HorizontalAlignment="Center" Width="200">
+                    <Grid Margin="0,0,0,5">
+                        <TextBlock Text="Puissance" HorizontalAlignment="Left" Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <TextBlock x:Name="TxtLabelPowerValue" Text="50%" HorizontalAlignment="Right" FontWeight="Bold"/>
+                    </Grid>
+                    <Slider x:Name="SliderPower" Orientation="Horizontal" Minimum="0" Maximum="100" Value="10" TickFrequency="25" TickPlacement="Outside" IsEnabled="False" ValueChanged="SliderPower_ValueChanged"/>
+                </StackPanel>
+
+                <Grid HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="1" x:Name="BtnUp" Tag="AVANCER" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2" IsEnabled="False">
+                        <FontIcon Glyph="&#xE74A;"/>
+                    </Button>
+                    <Button Grid.Row="1" Grid.Column="0" x:Name="BtnLeft" Tag="GAUCHE" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2" IsEnabled="False">
+                        <FontIcon Glyph="&#xE76B;"/>
+                    </Button>
+                    <Button Grid.Row="1" Grid.Column="2" x:Name="BtnRight" Tag="DROITE" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2" IsEnabled="False">
+                        <FontIcon Glyph="&#xE76C;"/>
+                    </Button>
+                    <Button Grid.Row="2" Grid.Column="1" x:Name="BtnDown" Tag="RECULER" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2" IsEnabled="False">
+                        <FontIcon Glyph="&#xE74B;"/>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Données reçues du robot :" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,5"/>
+            <ScrollViewer x:Name="ScrollLogs" Grid.Row="1" Height="100" BorderBrush="Gray" BorderThickness="1" Padding="5">
+                <TextBox x:Name="TxtLogs" IsReadOnly="True" TextWrapping="Wrap" BorderThickness="0" Background="Transparent"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

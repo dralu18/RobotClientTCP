@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RobotClientTCP (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "RobotClientTCP (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
